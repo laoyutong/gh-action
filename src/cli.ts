@@ -1,5 +1,5 @@
 import cac from "cac";
-import { handleCreateAction } from "./core";
+import { handleCreateAction, handleDeleteAction } from "./core";
 import { logError } from "./util";
 
 import type { ErrorType } from "./type";
@@ -15,6 +15,11 @@ cli
   )
   .option("--private", "whether the repository is private")
   .action(handleCreateAction);
+
+cli
+  .command("delete <name>", "delete a github repository")
+  .option("--token <token>", "personal access token")
+  .action(handleDeleteAction);
 
 cli.help();
 

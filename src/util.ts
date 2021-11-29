@@ -13,3 +13,8 @@ export const logInfo = (info: string) => {
 export const logSuccess = (msg: string) => {
   log(chalk.green("SUCCESS: " + msg));
 };
+
+export const getHeader = (token: string) => ({
+  accept: "application/vnd.github.v3+json",
+  authorization: `token ${token}`,
+});

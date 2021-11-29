@@ -1,9 +1,18 @@
 import fs from "fs/promises";
 import axios from "axios";
+import simpleGit, { SimpleGit } from "simple-git/promise";
 
-import { logError, logInfo, logSuccess } from "./util";
-import { CONFIG_FILE_PATH } from "./config";
-import type { Config, Options } from "./type";
+import { logError, logInfo, logSuccess, getHeader } from "./util";
+import { CONFIG_FILE_PATH, USER_NAME_FILED } from "./config";
+import type {
+  CreateConfig,
+  DetailOptions,
+  BaseOptions,
+  DeleteConfig,
+  HandleActionCallback,
+} from "./type";
+
+const git: SimpleGit = simpleGit();
 
 const writeConfigFile = (content: string) => {
   fs.writeFile(CONFIG_FILE_PATH, content)
@@ -24,14 +33,11 @@ const getTokenFromConfigFile = () => {
     .catch(() => {});
 };
 
-export const createRepository = (config: Config) => {
+const createRepository = (config: CreateConfig) => {
   const { token, ...data } = config;
   axios
     .post("https://api.github.com/user/repos", data, {
-      headers: {
-        accept: "application/vnd.github.v3+json",
-        authorization: `token ${config.token}`,
-      },
+      headers: getHeader(token!),
     })
     .then(() => {
       logSuccess("create a repository successfully");
@@ -41,18 +47,73 @@ export const createRepository = (config: Config) => {
     });
 };
 
-export const handleCreateAction = async (name: string, options: Options) => {
+const deleteRepository = async (config: DeleteConfig) => {
+  const { token, name } = config;
+  git
+    .listConfig()
+    .then(({ files, values }) => {
+      let username;
+      for (let file of files) {
+        const content = values[file];
+        const value = content[USER_NAME_FILED];
+        if (value) {
+          username = value;
+          break;
+        }
+      }
+      if (!username) {
+        logError("can't find user.name in git config");
+        return;
+      }
+      axios
+        .delete(`https://api.github.com/repos/${username}/${name}`, {
+          headers: getHeader(token!),
+        })
+        .then(() => {
+          logSuccess("delete a repository successfully");
+        })
+        .catch((err) => {
+          logError(err.message);
+        });
+    })
+    .catch((err) => {
+      logError(err.message);
+    });
+};
+
+export const handleCreateAction = async (
+  name: string,
+  options: DetailOptions
+) => {
   const config = { name, ...options };
-  if (options.token) {
-    writeConfigFile(options.token);
-    createRepository(config);
+  handleAction(options.token, (token?: string) =>
+    createRepository({ ...config, token })
+  );
+};
+
+export const handleDeleteAction = async (
+  name: string,
+  options: BaseOptions
+) => {
+  const config = { name, ...options };
+  handleAction(options.token, (token?: string) =>
+    deleteRepository({ ...config, token })
+  );
+};
+
+const handleAction = async (
+  token: string | undefined,
+  callback: HandleActionCallback
+) => {
+  if (token) {
+    writeConfigFile(token);
+    callback();
   } else {
-    const token = await getTokenFromConfigFile();
-    if (!token) {
+    const cacheToken = await getTokenFromConfigFile();
+    if (!cacheToken) {
       logError("need token to authenticate");
     } else {
-      config.token = token;
-      createRepository(config);
+      callback(cacheToken);
     }
   }
 };
