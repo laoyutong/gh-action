@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import fs from "fs/promises";
 
-import { CONFIG_FILE_PATH } from "./config";
+import {CONFIG_FILE_PATH} from './config'
 
 const log = console.log;
 

@@ -1,15 +1,9 @@
 import fs from "fs/promises";
-import axios from "axios";
 import simpleGit, { SimpleGit } from "simple-git/promise";
 
-import {
-  logError,
-  logInfo,
-  logSuccess,
-  getHeader,
-  getTokenFromConfigFile,
-} from "./util";
+import { logError, logInfo, logSuccess, getTokenFromConfigFile } from "./util";
 import { CONFIG_FILE_PATH, USER_NAME_FILED } from "./config";
+import { getRepoApi, deleteRepoApi } from "./api";
 import type {
   CreateConfig,
   DetailOptions,
@@ -32,10 +26,7 @@ export const handleTokenAction = (token: string) => {
 
 const createRepository = (config: CreateConfig) => {
   const { token, ...data } = config;
-  axios
-    .post("https://api.github.com/user/repos", data, {
-      headers: getHeader(token!),
-    })
+  getRepoApi(data, token!)
     .then(() => {
       logSuccess("create a repository successfully");
     })
@@ -62,10 +53,11 @@ const deleteRepository = async (config: DeleteConfig) => {
         logError("can't find user.name in git config");
         return;
       }
-      axios
-        .delete(`https://api.github.com/repos/${username}/${name}`, {
-          headers: getHeader(token!),
-        })
+      deleteRepoApi(
+        Array.isArray(username) ? username[0] : username,
+        name,
+        token!
+      )
         .then(() => {
           logSuccess("delete a repository successfully");
         })
