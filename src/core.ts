@@ -5,6 +5,7 @@ import {
   logError,
   logInfo,
   logSuccess,
+  logMessage,
   getTokenFromConfigFile,
   handleApiErrorMessage,
 } from "./util";
@@ -33,8 +34,11 @@ export const handleTokenAction = (token: string) => {
 const createRepository = (config: CreateConfig) => {
   const { token, ...data } = config;
   getRepoApi(data, token!)
-    .then(() => {
+    .then(({ data }) => {
+      const { clone_url, ssh_url } = data;
       logSuccess("create a repository successfully");
+      logMessage("clone_url: " + clone_url);
+      logMessage("ssh_url: " + ssh_url);
     })
     .catch((err) => {
       handleApiErrorMessage(err);

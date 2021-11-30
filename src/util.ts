@@ -17,6 +17,10 @@ export const logSuccess = (msg: string) => {
   log(chalk.green("SUCCESS: " + msg));
 };
 
+export const logMessage = (msg: string) => {
+  log(chalk.bold(msg));
+};
+
 export const getHeader = (token: string) => ({
   accept: "application/vnd.github.v3+json",
   authorization: `token ${token}`,
@@ -34,5 +38,5 @@ export const getTokenFromConfigFile = () => {
 export const handleApiErrorMessage = (error: ApiError) => {
   const { message, documentation_url } = error.response.data;
   logError(message);
-  logInfo("Reference address " + documentation_url);
+  logMessage("Reference address " + documentation_url);
 };

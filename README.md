@@ -13,11 +13,17 @@ npm install gh-action -g
 create a github repository
 
 ```bash
-gh-action create repo-name
+gh-action create <repo-name>
 ```
 
 delete a github respository
 
 ```bash
-gh-action delete repo-name
+gh-action delete <repo-name>
+```
+
+configure token
+
+```bash
+gh-action config <token-value>
 ```
