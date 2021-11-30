@@ -1,5 +1,9 @@
 import cac from "cac";
-import { handleCreateAction, handleDeleteAction } from "./core";
+import {
+  handleCreateAction,
+  handleDeleteAction,
+  handleTokenAction,
+} from "./core";
 import { logError } from "./util";
 
 import type { ErrorType } from "./type";
@@ -20,6 +24,8 @@ cli
   .command("delete <name>", "delete a github repository")
   .option("--token <token>", "personal access token")
   .action(handleDeleteAction);
+
+cli.command("config <token>", "configure token").action(handleTokenAction);
 
 cli.help();
 

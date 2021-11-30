@@ -1,4 +1,7 @@
 import chalk from "chalk";
+import fs from "fs/promises";
+
+import { CONFIG_FILE_PATH } from "./config";
 
 const log = console.log;
 
@@ -18,3 +21,12 @@ export const getHeader = (token: string) => ({
   accept: "application/vnd.github.v3+json",
   authorization: `token ${token}`,
 });
+
+export const getTokenFromConfigFile = () => {
+  return fs
+    .readFile(CONFIG_FILE_PATH)
+    .then((res) => {
+      return res.toString();
+    })
+    .catch(() => {});
+};

@@ -2,7 +2,13 @@ import fs from "fs/promises";
 import axios from "axios";
 import simpleGit, { SimpleGit } from "simple-git/promise";
 
-import { logError, logInfo, logSuccess, getHeader } from "./util";
+import {
+  logError,
+  logInfo,
+  logSuccess,
+  getHeader,
+  getTokenFromConfigFile,
+} from "./util";
 import { CONFIG_FILE_PATH, USER_NAME_FILED } from "./config";
 import type {
   CreateConfig,
@@ -14,23 +20,14 @@ import type {
 
 const git: SimpleGit = simpleGit();
 
-const writeConfigFile = (content: string) => {
-  fs.writeFile(CONFIG_FILE_PATH, content)
+export const handleTokenAction = (token: string) => {
+  fs.writeFile(CONFIG_FILE_PATH, token)
     .then(() => {
       logInfo("token stored on " + CONFIG_FILE_PATH);
     })
     .catch((err) => {
       logError(err.message);
     });
-};
-
-const getTokenFromConfigFile = () => {
-  return fs
-    .readFile(CONFIG_FILE_PATH)
-    .then((res) => {
-      return res.toString();
-    })
-    .catch(() => {});
 };
 
 const createRepository = (config: CreateConfig) => {
@@ -106,7 +103,7 @@ const handleAction = async (
   callback: HandleActionCallback
 ) => {
   if (token) {
-    writeConfigFile(token);
+    handleTokenAction(token);
     callback();
   } else {
     const cacheToken = await getTokenFromConfigFile();
