@@ -18,3 +18,12 @@ export type HandleActionCallback = (token?: string) => void;
 export interface ErrorType {
   message: string;
 }
+
+export interface ApiError {
+  response: {
+    data: {
+      message: string;
+      documentation_url: string;
+    };
+  };
+}

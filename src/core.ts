@@ -1,7 +1,13 @@
 import fs from "fs/promises";
 import simpleGit, { SimpleGit } from "simple-git/promise";
 
-import { logError, logInfo, logSuccess, getTokenFromConfigFile } from "./util";
+import {
+  logError,
+  logInfo,
+  logSuccess,
+  getTokenFromConfigFile,
+  handleApiErrorMessage,
+} from "./util";
 import { CONFIG_FILE_PATH, USER_NAME_FILED } from "./config";
 import { getRepoApi, deleteRepoApi } from "./api";
 import type {
@@ -31,7 +37,7 @@ const createRepository = (config: CreateConfig) => {
       logSuccess("create a repository successfully");
     })
     .catch((err) => {
-      logError(err.message);
+      handleApiErrorMessage(err);
     });
 };
 
@@ -62,7 +68,7 @@ const deleteRepository = async (config: DeleteConfig) => {
           logSuccess("delete a repository successfully");
         })
         .catch((err) => {
-          logError(err.message);
+          handleApiErrorMessage(err);
         });
     })
     .catch((err) => {

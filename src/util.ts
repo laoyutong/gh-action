@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import fs from "fs/promises";
-
-import {CONFIG_FILE_PATH} from './config'
+import { CONFIG_FILE_PATH } from "./config";
+import type { ApiError } from "./type";
 
 const log = console.log;
 
@@ -29,4 +29,10 @@ export const getTokenFromConfigFile = () => {
       return res.toString();
     })
     .catch(() => {});
+};
+
+export const handleApiErrorMessage = (error: ApiError) => {
+  const { message, documentation_url } = error.response.data;
+  logError(message);
+  logInfo("Reference address " + documentation_url);
 };
